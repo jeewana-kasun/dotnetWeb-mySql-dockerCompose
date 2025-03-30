@@ -26,19 +26,26 @@ namespace WebApplicationMySQL
         public void ConfigureServices(IServiceCollection services)
         {
 
-            var host = Configuration["DBHOST"] ?? "localhost";
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)  // Set the base path to the current directory
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)  // Add JSON configuration file
+                .Build();
 
-            var port = Configuration["DBPORT"] ?? "3306";
+            var host = configuration["DatabaseSettings:Host"];
 
-            var password = Configuration["DBPASSWORD"] ?? "1234";
+            var port = configuration["DatabaseSettings:Port"];
 
+            var user = configuration["DatabaseSettings:User"];
 
+            var password = configuration["DatabaseSettings:Password"];
+
+            var database = configuration["DatabaseSettings:Database"];
 
             services.AddDbContextPool<StudentDetailContext>(
                     options =>
                     {
-                        options.UseMySql($"server={host};userid=root;pwd={password};"
-                        + $"port={port};database=Users");
+                        options.UseMySql($"server={host};userid={user};pwd={password};"
+                        + $"port={port};database={database}");
                     });
             services.AddControllersWithViews();
         }
